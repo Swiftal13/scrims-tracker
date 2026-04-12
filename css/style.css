@@ -88,13 +88,6 @@ h1 {
 .h1-white { color: #FFFFFF; text-shadow: 2px 2px #888888; }
 .h1-blue  { color: #5555FF; text-shadow: 2px 2px #0000AA; }
 
-.server-address {
-  font-family: var(--font-pixel);
-  font-size: 0.5rem;
-  color: var(--mc-dark-gray);
-  letter-spacing: 0.06em;
-}
-
 .byline {
   font-family: var(--font-pixel);
   font-size: 0.52rem;
@@ -134,6 +127,14 @@ h1 {
   border-bottom: 2px solid #000;
   border-left: 5px solid var(--mc-dark-gray);
   transition: border-left-color 0.25s, background 0.25s;
+}
+
+.banner-server-addr {
+  font-family: var(--font-pixel);
+  font-size: 0.42rem;
+  color: var(--mc-dark-gray);
+  letter-spacing: 0.06em;
+  margin-left: auto;
 }
 
 .status-banner.online {
