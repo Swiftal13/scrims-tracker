@@ -13,36 +13,35 @@
   <div class="page-wrap">
 
     <header class="site-header">
-      <div class="header-icon-wrap">
-        <img id="serverIcon" class="server-icon" src="server-icon.png" alt="Server icon" />
-      </div>
+      <img id="serverIcon" class="server-icon" src="server-icon.png" alt="Server icon" />
       <div class="header-text">
-        <h1><span class="h1-red">na.scrims</span><span class="h1-white">.</span><span class="h1-blue">network</span></h1>
-        <p class="byline">
-          by <a href="https://www.youtube.com/@margischole" target="_blank" rel="noopener noreferrer">Swiftal</a>
-        </p>
+        <h1>
+          <span class="h1-red">na.scrims</span><br>
+          <span class="h1-white">.</span><span class="h1-blue">network</span>
+        </h1>
+        <p class="byline">by <a href="https://www.youtube.com/@margischole" target="_blank" rel="noopener noreferrer">Swiftal</a></p>
       </div>
     </header>
 
     <div class="mc-panel" id="mainPanel">
 
-      <!-- Status bar -->
-      <div class="status-row">
+      <!-- Status banner -->
+      <div class="status-banner" id="statusBanner">
         <div class="status-pip" id="statusPip"></div>
         <span class="status-text" id="statusText">Checking...</span>
         <span class="version-badge hidden" id="versionBadge"></span>
       </div>
 
-      <!-- Player count + MOTD -->
-      <div class="info-grid hidden" id="infoGrid">
-        <div class="info-cell">
-          <span class="info-label">Players</span>
-          <span class="info-value" id="playerCount">—</span>
-        </div>
-        <div class="info-cell hidden" id="motdCell">
-          <span class="info-label">MOTD</span>
-          <span class="info-value motd-value" id="motdText"></span>
-        </div>
+      <!-- Hero player count -->
+      <div class="player-hero hidden" id="infoGrid">
+        <span class="player-hero-label">Players Online</span>
+        <span class="player-hero-count" id="playerCount">—</span>
+      </div>
+
+      <!-- MOTD -->
+      <div class="info-cell hidden" id="motdCell" style="margin-bottom:1.2rem">
+        <span class="info-label">MOTD</span>
+        <span class="info-value motd-value" id="motdText"></span>
       </div>
 
       <!-- Player list -->
@@ -65,7 +64,7 @@
         </div>
       </div>
 
-    </div><!-- .mc-panel -->
+    </div>
 
     <!-- Graph panel -->
     <div class="mc-panel graph-panel">
@@ -76,7 +75,7 @@
       </div>
     </div>
 
-  </div><!-- .page-wrap -->
+  </div>
 
   <script src="js/app.js"></script>
 </body>

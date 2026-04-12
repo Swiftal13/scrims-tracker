@@ -11,6 +11,7 @@ let prevPlayerNames = new Set();
 let chipMap = new Map();
 
 const serverIcon = document.getElementById('serverIcon');
+const statusBanner = document.getElementById('statusBanner');
 const statusPip = document.getElementById('statusPip');
 const statusText = document.getElementById('statusText');
 const versionBadge = document.getElementById('versionBadge');
@@ -114,12 +115,14 @@ async function fetchStatus() {
 }
 
 function setLoading() {
+  statusBanner.className = 'status-banner';
   statusPip.className = 'status-pip';
   statusText.className = 'status-text';
   statusText.textContent = 'Checking...';
 }
 
 function renderError() {
+  statusBanner.className = 'status-banner error';
   statusPip.className = 'status-pip offline';
   statusText.className = 'status-text error';
   statusText.textContent = 'Error — retrying...';
@@ -142,6 +145,7 @@ function render(data) {
     versionBadge.classList.add('hidden');
   }
 
+  statusBanner.className = `status-banner ${online ? 'online' : 'offline'}`;
   statusPip.className = `status-pip ${online ? 'online' : 'offline'}`;
   statusText.className = `status-text ${online ? 'online' : 'offline'}`;
 
