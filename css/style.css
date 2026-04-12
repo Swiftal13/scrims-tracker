@@ -116,13 +116,13 @@ body {
 h1 {
   font-family: var(--font-pixel);
   font-size: clamp(0.7rem, 2.2vw, 1rem);
-  background: linear-gradient(90deg, #FF5555 50%, #5555FF 50%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
   line-height: 1.6;
   letter-spacing: 0.02em;
 }
+
+.h1-red   { color: #FF5555; text-shadow: 2px 2px #AA0000; }
+.h1-white { color: #FFFFFF; text-shadow: 2px 2px #888888; }
+.h1-blue  { color: #5555FF; text-shadow: 2px 2px #0000AA; }
 
 .byline {
   font-family: var(--font-pixel);
