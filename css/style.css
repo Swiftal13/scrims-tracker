@@ -1,0 +1,444 @@
+/* ============================================================
+   Minecraft Server Tracker — Style Sheet
+   ============================================================ */
+
+/* ── Variables ─────────────────────────────────────────────── */
+:root {
+  /* Minecraft palette */
+  --mc-green:      #55FF55;
+  --mc-green-dim:  #00AA00;
+  --mc-red:        #FF5555;
+  --mc-red-dim:    #AA0000;
+  --mc-yellow:     #FFFF55;
+  --mc-gold:       #FFAA00;
+  --mc-white:      #FFFFFF;
+  --mc-gray:       #AAAAAA;
+  --mc-dark-gray:  #555555;
+
+  /* UI structure */
+  --bg:            #101010;
+  --panel-bg:      #1a1a1a;
+  --panel-inner:   #141414;
+  --rule-color:    #2a2a2a;
+
+  /* Minecraft bevel */
+  --bevel-light:   rgba(255,255,255,0.12);
+  --bevel-dark:    rgba(0,0,0,0.6);
+
+  /* Typography */
+  --font-pixel:    'Press Start 2P', monospace;
+  --font-body:     'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+/* ── Reset ──────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ── Body / Background ──────────────────────────────────────── */
+body {
+  background-color: var(--bg);
+  /* Subtle 32×32 stone-block grid */
+  background-image:
+    linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+  background-size: 32px 32px;
+  color: var(--mc-white);
+  font-family: var(--font-body);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2.5rem 1rem 5rem;
+}
+
+/* ── Page wrapper ───────────────────────────────────────────── */
+.page-wrap {
+  width: 100%;
+  max-width: 660px;
+}
+
+/* ── Header ─────────────────────────────────────────────────── */
+.site-header {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  margin-bottom: 1.75rem;
+}
+
+/* Grass block CSS art */
+.grass-block {
+  width: 64px;
+  height: 64px;
+  flex-shrink: 0;
+  image-rendering: pixelated;
+  border: 2px solid #000;
+  box-shadow:
+    inset 1px 1px 0 rgba(255,255,255,.18),
+    inset -1px -1px 0 rgba(0,0,0,.5),
+    3px 3px 0 #000;
+  overflow: hidden;
+}
+
+.grass-top {
+  height: 17px;
+  background: linear-gradient(180deg,
+    #6bbf3a 0%,
+    #5aab2e 50%,
+    #4d9425 100%
+  );
+  position: relative;
+}
+
+/* tiny grass blade details */
+.grass-top::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(90deg,
+      transparent 0px, transparent 3px,
+      rgba(0,0,0,.18) 3px, rgba(0,0,0,.18) 4px
+    );
+}
+
+.dirt-body {
+  height: 47px;
+  background: linear-gradient(180deg, #6b4423 0%, #7a5230 40%, #6b4423 100%);
+  position: relative;
+}
+
+.dirt-body::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(ellipse 3px 2px at 8px 6px,  rgba(0,0,0,.25) 100%, transparent 100%),
+    radial-gradient(ellipse 2px 2px at 22px 14px, rgba(0,0,0,.2)  100%, transparent 100%),
+    radial-gradient(ellipse 3px 2px at 38px 8px,  rgba(0,0,0,.22) 100%, transparent 100%),
+    radial-gradient(ellipse 2px 3px at 50px 18px, rgba(0,0,0,.18) 100%, transparent 100%),
+    radial-gradient(ellipse 4px 2px at 12px 28px, rgba(0,0,0,.2)  100%, transparent 100%),
+    radial-gradient(ellipse 2px 2px at 44px 32px, rgba(0,0,0,.22) 100%, transparent 100%);
+}
+
+/* Server icon (from API) */
+.server-icon {
+  width: 64px;
+  height: 64px;
+  image-rendering: pixelated;
+  border: 2px solid #000;
+  box-shadow: 3px 3px 0 #000;
+}
+
+/* Header text */
+.header-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+h1 {
+  font-family: var(--font-pixel);
+  font-size: clamp(0.7rem, 2.2vw, 1rem);
+  color: var(--mc-green);
+  text-shadow: 2px 2px var(--mc-green-dim);
+  line-height: 1.6;
+  letter-spacing: 0.02em;
+}
+
+.byline {
+  font-family: var(--font-pixel);
+  font-size: 0.55rem;
+  color: var(--mc-gray);
+  letter-spacing: 0.04em;
+}
+
+.byline a {
+  color: var(--mc-yellow);
+  text-shadow: 1px 1px var(--mc-gold);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+.byline a:hover {
+  color: var(--mc-gold);
+  text-decoration: underline;
+}
+
+/* ── Main panel (Minecraft GUI style) ───────────────────────── */
+.mc-panel {
+  background: var(--panel-bg);
+  border: 2px solid #000;
+  /* Bevel: lighter top-left, darker bottom-right */
+  box-shadow:
+    inset 2px 2px 0 var(--bevel-light),
+    inset -2px -2px 0 var(--bevel-dark),
+    4px 4px 0 #000;
+  padding: 1.5rem 1.75rem 1.25rem;
+}
+
+/* ── Status row ─────────────────────────────────────────────── */
+.status-row {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  margin-bottom: 1.2rem;
+}
+
+.status-pip {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  background: var(--mc-dark-gray);
+  border: 2px solid #000;
+  box-shadow: inset 1px 1px 0 rgba(255,255,255,.15), inset -1px -1px 0 rgba(0,0,0,.4);
+  transition: background 0.25s, box-shadow 0.25s;
+}
+
+.status-pip.online {
+  background: var(--mc-green);
+  box-shadow:
+    inset 1px 1px 0 rgba(255,255,255,.3),
+    inset -1px -1px 0 rgba(0,0,0,.3),
+    0 0 10px var(--mc-green-dim),
+    0 0 20px rgba(85,255,85,.15);
+  animation: glow 2s ease-in-out infinite;
+}
+
+.status-pip.offline {
+  background: var(--mc-red);
+  box-shadow:
+    inset 1px 1px 0 rgba(255,255,255,.2),
+    inset -1px -1px 0 rgba(0,0,0,.4),
+    0 0 8px var(--mc-red-dim);
+}
+
+@keyframes glow {
+  0%, 100% { box-shadow: inset 1px 1px 0 rgba(255,255,255,.3), 0 0 8px var(--mc-green-dim); }
+  50%       { box-shadow: inset 1px 1px 0 rgba(255,255,255,.3), 0 0 18px var(--mc-green), 0 0 30px rgba(85,255,85,.2); }
+}
+
+.status-text {
+  font-family: var(--font-pixel);
+  font-size: 0.7rem;
+  color: var(--mc-gray);
+  line-height: 1;
+}
+
+.status-text.online  { color: var(--mc-green); text-shadow: 1px 1px var(--mc-green-dim); }
+.status-text.offline { color: var(--mc-red);   text-shadow: 1px 1px var(--mc-red-dim);   }
+.status-text.error   { color: var(--mc-gold);  text-shadow: 1px 1px #a06000; }
+
+/* ── Info grid ──────────────────────────────────────────────── */
+.info-grid {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.2rem;
+}
+
+.info-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  background: var(--panel-inner);
+  border: 2px solid #000;
+  box-shadow: inset 1px 1px 0 rgba(0,0,0,.5), inset -1px -1px 0 rgba(255,255,255,.06);
+  padding: 0.65rem 1rem;
+  min-width: 120px;
+}
+
+.info-label {
+  font-family: var(--font-pixel);
+  font-size: 0.45rem;
+  color: var(--mc-gray);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.info-value {
+  font-family: var(--font-pixel);
+  font-size: 0.9rem;
+  color: var(--mc-white);
+  text-shadow: 1px 1px rgba(0,0,0,.8);
+  line-height: 1.4;
+}
+
+.info-value .accent {
+  color: var(--mc-green);
+  text-shadow: 1px 1px var(--mc-green-dim);
+}
+
+.motd-value {
+  font-size: 0.55rem;
+  color: var(--mc-gray);
+}
+
+/* ── Horizontal rule ────────────────────────────────────────── */
+.mc-rule {
+  border: none;
+  height: 2px;
+  background: #000;
+  box-shadow: 0 1px 0 rgba(255,255,255,.06);
+  margin: 1.25rem 0;
+}
+
+/* ── Player list ────────────────────────────────────────────── */
+.section-heading {
+  font-family: var(--font-pixel);
+  font-size: 0.5rem;
+  color: var(--mc-gray);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 0.9rem;
+}
+
+.player-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.player-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--panel-inner);
+  border: 2px solid #000;
+  box-shadow:
+    inset 1px 1px 0 var(--bevel-light),
+    inset -1px -1px 0 var(--bevel-dark);
+  padding: 0.35rem 0.65rem 0.35rem 0.4rem;
+  cursor: default;
+  transition: box-shadow 0.12s, background 0.12s;
+}
+
+.player-chip:hover {
+  background: #1e1e1e;
+  box-shadow:
+    inset 1px 1px 0 rgba(255,255,255,.18),
+    inset -1px -1px 0 rgba(0,0,0,.7),
+    0 0 8px rgba(85,255,85,.12);
+}
+
+.player-chip img {
+  width: 28px;
+  height: 28px;
+  image-rendering: pixelated;
+  border: 1px solid #000;
+  flex-shrink: 0;
+}
+
+.player-chip .player-name {
+  font-family: var(--font-pixel);
+  font-size: 0.5rem;
+  color: var(--mc-white);
+  text-shadow: 1px 1px rgba(0,0,0,.8);
+  white-space: nowrap;
+}
+
+.empty-msg {
+  font-family: var(--font-pixel);
+  font-size: 0.5rem;
+  color: var(--mc-dark-gray);
+  font-style: italic;
+  line-height: 1.8;
+}
+
+/* ── Panel footer ───────────────────────────────────────────── */
+.panel-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 2px solid #000;
+  box-shadow: 0 -1px 0 rgba(255,255,255,.04);
+}
+
+.last-updated {
+  font-family: var(--font-pixel);
+  font-size: 0.42rem;
+  color: var(--mc-dark-gray);
+  line-height: 1.6;
+}
+
+.refresh-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.countdown-num {
+  font-family: var(--font-pixel);
+  font-size: 0.55rem;
+  color: var(--mc-gray);
+  min-width: 2ch;
+  text-align: right;
+}
+
+.countdown-unit {
+  font-family: var(--font-pixel);
+  font-size: 0.45rem;
+  color: var(--mc-dark-gray);
+}
+
+/* XP-bar style progress */
+.progress-track {
+  width: 72px;
+  height: 6px;
+  background: #000;
+  border: 1px solid #333;
+  box-shadow: inset 0 1px 0 rgba(0,0,0,.6);
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(180deg, #80ff40 0%, #55cc22 60%, #3aaa10 100%);
+  box-shadow: 0 0 4px rgba(85,255,85,.4);
+  transition: width 1s linear;
+}
+
+/* Low-time warning color */
+.progress-fill.warn {
+  background: linear-gradient(180deg, #ffdd44 0%, #ffaa00 60%, #dd8800 100%);
+  box-shadow: 0 0 4px rgba(255,170,0,.5);
+}
+
+/* ── Minecraft button ───────────────────────────────────────── */
+.mc-btn {
+  font-family: var(--font-pixel);
+  font-size: 0.45rem;
+  color: var(--mc-white);
+  background: #3a3a3a;
+  border: 2px solid #000;
+  box-shadow:
+    inset 1px 1px 0 rgba(255,255,255,.18),
+    inset -1px -1px 0 rgba(0,0,0,.5);
+  padding: 0.45rem 0.75rem;
+  cursor: pointer;
+  text-shadow: 1px 1px rgba(0,0,0,.8);
+  transition: background 0.1s, box-shadow 0.1s;
+  white-space: nowrap;
+}
+
+.mc-btn:hover {
+  background: #4a4a4a;
+  color: var(--mc-yellow);
+  box-shadow:
+    inset 1px 1px 0 rgba(255,255,255,.25),
+    inset -1px -1px 0 rgba(0,0,0,.5);
+}
+
+.mc-btn:active {
+  background: #2a2a2a;
+  box-shadow:
+    inset 2px 2px 0 rgba(0,0,0,.5),
+    inset -1px -1px 0 rgba(255,255,255,.08);
+  transform: translateY(1px);
+}
+
+/* ── Utility ────────────────────────────────────────────────── */
+.hidden { display: none !important; }
