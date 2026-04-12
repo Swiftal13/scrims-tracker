@@ -463,6 +463,7 @@ h1 {
 /* ── Graph panel ── */
 .graph-panel {
   margin-top: 1.25rem;
+  padding-top: 1.25rem;
 }
 
 .graph-sub {
