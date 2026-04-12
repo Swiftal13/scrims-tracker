@@ -116,8 +116,10 @@ body {
 h1 {
   font-family: var(--font-pixel);
   font-size: clamp(0.7rem, 2.2vw, 1rem);
-  color: var(--mc-green);
-  text-shadow: 2px 2px var(--mc-green-dim);
+  background: linear-gradient(90deg, #FF5555 50%, #5555FF 50%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   line-height: 1.6;
   letter-spacing: 0.02em;
 }
@@ -130,15 +132,14 @@ h1 {
 }
 
 .byline a {
-  color: var(--mc-yellow);
-  text-shadow: 1px 1px var(--mc-gold);
-  text-decoration: none;
+  color: var(--mc-gray);
+  text-shadow: none;
+  text-decoration: underline;
   transition: color 0.15s;
 }
 
 .byline a:hover {
-  color: var(--mc-gold);
-  text-decoration: underline;
+  color: var(--mc-white);
 }
 
 .mc-panel {
