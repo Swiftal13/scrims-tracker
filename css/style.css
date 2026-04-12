@@ -88,6 +88,13 @@ h1 {
 .h1-white { color: #FFFFFF; text-shadow: 2px 2px #888888; }
 .h1-blue  { color: #5555FF; text-shadow: 2px 2px #0000AA; }
 
+.server-address {
+  font-family: var(--font-pixel);
+  font-size: 0.5rem;
+  color: var(--mc-dark-gray);
+  letter-spacing: 0.06em;
+}
+
 .byline {
   font-family: var(--font-pixel);
   font-size: 0.52rem;
