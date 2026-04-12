@@ -11,7 +11,6 @@ let prevPlayerNames = new Set();
 let chipMap = new Map();
 
 const serverIcon = document.getElementById('serverIcon');
-const iconFallback = document.getElementById('iconFallback');
 const statusPip = document.getElementById('statusPip');
 const statusText = document.getElementById('statusText');
 const versionBadge = document.getElementById('versionBadge');
@@ -134,11 +133,7 @@ function render(data) {
   const cur = data.players?.online ?? 0;
   const max = data.players?.max ?? 0;
 
-  if (data.icon) {
-    serverIcon.src = data.icon;
-    serverIcon.classList.remove('hidden');
-    iconFallback.classList.add('hidden');
-  }
+  if (data.icon) serverIcon.src = data.icon;
 
   if (data.version) {
     versionBadge.textContent = data.version;

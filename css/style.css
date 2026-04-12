@@ -58,54 +58,6 @@ body {
   margin-bottom: 1.75rem;
 }
 
-.grass-block {
-  width: 64px;
-  height: 64px;
-  flex-shrink: 0;
-  image-rendering: pixelated;
-  border: 2px solid #000;
-  box-shadow:
-    inset 1px 1px 0 rgba(255,255,255,.18),
-    inset -1px -1px 0 rgba(0,0,0,.5),
-    3px 3px 0 #000;
-  overflow: hidden;
-}
-
-.grass-top {
-  height: 17px;
-  background: linear-gradient(180deg, #6bbf3a 0%, #5aab2e 50%, #4d9425 100%);
-  position: relative;
-}
-
-.grass-top::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-image:
-    repeating-linear-gradient(90deg,
-      transparent 0px, transparent 3px,
-      rgba(0,0,0,.18) 3px, rgba(0,0,0,.18) 4px
-    );
-}
-
-.dirt-body {
-  height: 47px;
-  background: linear-gradient(180deg, #6b4423 0%, #7a5230 40%, #6b4423 100%);
-  position: relative;
-}
-
-.dirt-body::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-image:
-    radial-gradient(ellipse 3px 2px at 8px 6px,  rgba(0,0,0,.25) 100%, transparent 100%),
-    radial-gradient(ellipse 2px 2px at 22px 14px, rgba(0,0,0,.2)  100%, transparent 100%),
-    radial-gradient(ellipse 3px 2px at 38px 8px,  rgba(0,0,0,.22) 100%, transparent 100%),
-    radial-gradient(ellipse 2px 3px at 50px 18px, rgba(0,0,0,.18) 100%, transparent 100%),
-    radial-gradient(ellipse 4px 2px at 12px 28px, rgba(0,0,0,.2)  100%, transparent 100%),
-    radial-gradient(ellipse 2px 2px at 44px 32px, rgba(0,0,0,.22) 100%, transparent 100%);
-}
 
 .server-icon {
   width: 64px;
