@@ -27,7 +27,7 @@ jobs:
         if: steps.cname_check.outputs.exists == 'false'
         id: pr_check
         run: |
-          STATE=$(gh pr view 11084 --repo js-org/js.org --json state,mergedAt --jq '.state')
+          STATE=$(gh pr view 36264 --repo is-a-dev/register --json state,mergedAt --jq '.state')
           echo "state=$STATE" >> $GITHUB_OUTPUT
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
