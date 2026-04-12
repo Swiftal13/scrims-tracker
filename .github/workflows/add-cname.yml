@@ -1,0 +1,43 @@
+name: Add CNAME when js.org PR merges
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check if CNAME already exists
+        id: cname_check
+        run: |
+          if [ -f CNAME ]; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Check if js.org PR is merged
+        if: steps.cname_check.outputs.exists == 'false'
+        id: pr_check
+        run: |
+          STATE=$(gh pr view 11084 --repo js-org/js.org --json state,mergedAt --jq '.state')
+          echo "state=$STATE" >> $GITHUB_OUTPUT
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Add CNAME and push
+        if: steps.cname_check.outputs.exists == 'false' && steps.pr_check.outputs.state == 'MERGED'
+        run: |
+          echo "scrimstracker.js.org" > CNAME
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add CNAME
+          git commit -m "Add CNAME — scrimstracker.js.org is live"
+          git push
