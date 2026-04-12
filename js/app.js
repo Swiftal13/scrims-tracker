@@ -9,6 +9,7 @@ let offlineSince = null;
 
 let prevPlayerNames = new Set();
 let chipMap = new Map();
+let prevPlayerCount = -1;
 
 const serverIcon = document.getElementById('serverIcon');
 const statusBanner = document.getElementById('statusBanner');
@@ -156,6 +157,13 @@ function render(data) {
   statusText.textContent = 'Online';
 
   infoGrid.classList.remove('hidden');
+  if (cur !== prevPlayerCount) {
+    playerCount.classList.remove('player-hero-count--flip');
+    void playerCount.offsetWidth;
+    playerCount.classList.add('player-hero-count--flip');
+    playerCount.addEventListener('animationend', () => playerCount.classList.remove('player-hero-count--flip'), { once: true });
+  }
+  prevPlayerCount = cur;
   playerCount.innerHTML = `<span class="accent">${cur}</span> / ${max}`;
 
   const motdRaw = data.motd?.clean?.[0]?.trim() ?? '';
