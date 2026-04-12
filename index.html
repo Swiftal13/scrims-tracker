@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>na.scrims.network — Server Tracker</title>
+  <style>
+    /* ── Reset & base ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0f1117;
+      --surface:   #1a1d27;
+      --border:    #2a2d3a;
+      --green:     #4ade80;
+      --green-dim: #22c55e;
+      --red:       #f87171;
+      --text:      #e2e8f0;
+      --muted:     #64748b;
+      --radius:    8px;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem 1rem 4rem;
+    }
+
+    /* ── Header ── */
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    header h1 {
+      font-size: clamp(1.4rem, 4vw, 2rem);
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      color: var(--green);
+    }
+
+    header p.subtitle {
+      margin-top: 0.3rem;
+      color: var(--muted);
+      font-size: 0.875rem;
+    }
+
+    /* ── Main card ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem 2rem;
+      width: 100%;
+      max-width: 640px;
+    }
+
+    /* ── Status row ── */
+    .status-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .status-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      background: var(--muted);
+      box-shadow: 0 0 0 0 transparent;
+      transition: background 0.3s, box-shadow 0.3s;
+    }
+
+    .status-dot.online {
+      background: var(--green);
+      box-shadow: 0 0 8px var(--green-dim);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    .status-dot.offline {
+      background: var(--red);
+    }
+
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 6px var(--green-dim); }
+      50%       { box-shadow: 0 0 14px var(--green); }
+    }
+
+    .status-label {
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    .status-label.online  { color: var(--green); }
+    .status-label.offline { color: var(--red); }
+    .status-label.loading { color: var(--muted); }
+
+    /* ── Stats grid ── */
+    .stats {
+      display: flex;
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .stat {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+    }
+
+    .stat-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+    }
+
+    .stat-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .stat-value span.accent { color: var(--green); }
+
+    /* ── Divider ── */
+    hr {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin-bottom: 1.25rem;
+    }
+
+    /* ── Player list ── */
+    .section-title {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      margin-bottom: 0.9rem;
+    }
+
+    .player-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.55rem;
+    }
+
+    .player-chip {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.3rem 0.6rem 0.3rem 0.35rem;
+      font-size: 0.825rem;
+      color: var(--text);
+      transition: border-color 0.15s;
+    }
+
+    .player-chip:hover { border-color: var(--green-dim); }
+
+    .player-chip img {
+      width: 24px;
+      height: 24px;
+      border-radius: 3px;
+      image-rendering: pixelated;
+    }
+
+    .player-chip .name { font-weight: 500; }
+
+    .empty-msg {
+      color: var(--muted);
+      font-size: 0.875rem;
+      font-style: italic;
+    }
+
+    /* ── Footer row ── */
+    .footer-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 1.5rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .last-updated {
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    .countdown {
+      font-size: 0.75rem;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .countdown-bar-wrap {
+      width: 80px;
+      height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .countdown-bar {
+      height: 100%;
+      background: var(--green-dim);
+      border-radius: 2px;
+      transition: width 1s linear;
+    }
+
+    .refresh-btn {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      border-radius: 5px;
+      padding: 0.25rem 0.65rem;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s;
+    }
+
+    .refresh-btn:hover {
+      border-color: var(--green-dim);
+      color: var(--green);
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>na.scrims.network</h1>
+  <p class="subtitle">Minecraft Server Status</p>
+</header>
+
+<div class="card">
+  <!-- Status -->
+  <div class="status-row">
+    <div class="status-dot" id="dot"></div>
+    <span class="status-label loading" id="statusLabel">Checking…</span>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats" id="stats" style="display:none">
+    <div class="stat">
+      <span class="stat-label">Players</span>
+      <span class="stat-value" id="playerCount">—</span>
+    </div>
+    <div class="stat" id="motdStat" style="display:none">
+      <span class="stat-label">MOTD</span>
+      <span class="stat-value" style="font-size:0.9rem;color:var(--muted)" id="motdText"></span>
+    </div>
+  </div>
+
+  <!-- Player list -->
+  <div id="playerSection" style="display:none">
+    <hr />
+    <p class="section-title">Online Players</p>
+    <div class="player-grid" id="playerGrid"></div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer-row">
+    <span class="last-updated" id="lastUpdated">Never updated</span>
+    <div class="countdown">
+      <span id="countdownText">60s</span>
+      <div class="countdown-bar-wrap">
+        <div class="countdown-bar" id="countdownBar" style="width:100%"></div>
+      </div>
+      <button class="refresh-btn" onclick="triggerRefresh()">Refresh</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const API_URL   = 'https://api.mcsrvstat.us/3/na.scrims.network';
+  const AVATAR_BASE = 'https://crafatar.com/avatars/';
+  const INTERVAL  = 60; // seconds
+
+  let countdown = INTERVAL;
+  let timer;
+
+  // ── DOM refs ──────────────────────────────────────────────
+  const dot           = document.getElementById('dot');
+  const statusLabel   = document.getElementById('statusLabel');
+  const statsEl       = document.getElementById('stats');
+  const playerCountEl = document.getElementById('playerCount');
+  const motdStat      = document.getElementById('motdStat');
+  const motdText      = document.getElementById('motdText');
+  const playerSection = document.getElementById('playerSection');
+  const playerGrid    = document.getElementById('playerGrid');
+  const lastUpdated   = document.getElementById('lastUpdated');
+  const countdownText = document.getElementById('countdownText');
+  const countdownBar  = document.getElementById('countdownBar');
+
+  // ── Fetch ─────────────────────────────────────────────────
+  async function fetchStatus() {
+    try {
+      const res  = await fetch(API_URL);
+      const data = await res.json();
+      render(data);
+    } catch (err) {
+      renderError();
+    }
+    updateLastUpdated();
+    resetCountdown();
+  }
+
+  function render(data) {
+    const online = data.online === true;
+
+    // Status dot + label
+    dot.className = 'status-dot ' + (online ? 'online' : 'offline');
+    statusLabel.className = 'status-label ' + (online ? 'online' : 'offline');
+    statusLabel.textContent = online ? 'Online' : 'Offline';
+
+    if (!online) {
+      statsEl.style.display   = 'none';
+      playerSection.style.display = 'none';
+      return;
+    }
+
+    // Player count
+    statsEl.style.display = 'flex';
+    const cur = data.players?.online ?? 0;
+    const max = data.players?.max ?? '?';
+    playerCountEl.innerHTML = `<span class="accent">${cur}</span> / ${max}`;
+
+    // MOTD (strip color codes, show if non-empty)
+    const motdRaw = data.motd?.clean?.[0] ?? '';
+    if (motdRaw.trim()) {
+      motdText.textContent = motdRaw.trim();
+      motdStat.style.display = 'flex';
+    } else {
+      motdStat.style.display = 'none';
+    }
+
+    // Player list
+    const list = data.players?.list;
+    playerSection.style.display = 'block';
+    playerGrid.innerHTML = '';
+
+    if (!list || list.length === 0) {
+      if (cur === 0) {
+        playerGrid.innerHTML = '<span class="empty-msg">No players online.</span>';
+      } else {
+        playerGrid.innerHTML = '<span class="empty-msg">Player list is hidden by the server.</span>';
+      }
+      return;
+    }
+
+    list.forEach(player => {
+      const uuid = player.uuid;
+      const name = player.name ?? player;
+
+      const chip = document.createElement('div');
+      chip.className = 'player-chip';
+
+      if (uuid) {
+        const img = document.createElement('img');
+        img.src = `${AVATAR_BASE}${uuid}?size=32&overlay`;
+        img.alt = name;
+        img.loading = 'lazy';
+        chip.appendChild(img);
+      }
+
+      const nameEl = document.createElement('span');
+      nameEl.className = 'name';
+      nameEl.textContent = name;
+      chip.appendChild(nameEl);
+
+      playerGrid.appendChild(chip);
+    });
+  }
+
+  function renderError() {
+    dot.className = 'status-dot offline';
+    statusLabel.className = 'status-label offline';
+    statusLabel.textContent = 'Error fetching status';
+    statsEl.style.display = 'none';
+    playerSection.style.display = 'none';
+  }
+
+  // ── Helpers ───────────────────────────────────────────────
+  function updateLastUpdated() {
+    const now = new Date();
+    const fmt = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    lastUpdated.textContent = `Last updated: ${fmt}`;
+  }
+
+  function resetCountdown() {
+    countdown = INTERVAL;
+    clearInterval(timer);
+    timer = setInterval(tick, 1000);
+  }
+
+  function tick() {
+    countdown--;
+    countdownText.textContent = `${countdown}s`;
+    countdownBar.style.width = `${(countdown / INTERVAL) * 100}%`;
+    if (countdown <= 0) {
+      fetchStatus();
+    }
+  }
+
+  function triggerRefresh() {
+    clearInterval(timer);
+    fetchStatus();
+  }
+
+  // ── Boot ──────────────────────────────────────────────────
+  fetchStatus();
+</script>
+</body>
+</html>
