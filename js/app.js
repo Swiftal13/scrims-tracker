@@ -1,7 +1,7 @@
 const API_URL = 'https://api.mcsrvstat.us/3/na.scrims.network';
 const AVATAR_BASE = 'https://crafatar.com/avatars/';
 const INTERVAL = 60;
-const MAX_HISTORY = 30;
+const MAX_HISTORY = 168; // 7 days of hourly buckets
 
 let countdown = INTERVAL;
 let timer = null;
@@ -32,15 +32,50 @@ let history = [];
 
 function loadHistory() {
   try {
-    history = JSON.parse(localStorage.getItem('scrims-history') || '[]');
+    const raw = JSON.parse(localStorage.getItem('scrims-history') || '[]');
+    // discard old per-minute format (entries without a key field)
+    history = raw.filter(h => h.key !== undefined);
   } catch {
     history = [];
   }
 }
 
+function hourKey(date) {
+  return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}-${date.getHours()}`;
+}
+
+function hourStart(date) {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate(), date.getHours()).getTime();
+}
+
 function pushHistory(online, players, max) {
-  history.push({ t: Date.now(), o: online, p: players, m: max });
-  if (history.length > MAX_HISTORY) history.shift();
+  const now = new Date();
+  const key = hourKey(now);
+  const last = history[history.length - 1];
+
+  if (last && last.key === key) {
+    if (online) {
+      last.sum += players;
+      last.samples++;
+    }
+    last.total++;
+    last.p = last.samples > 0 ? Math.round(last.sum / last.samples) : 0;
+    last.m = Math.max(last.m, max);
+    last.o = last.samples > 0;
+  } else {
+    history.push({
+      key,
+      t: hourStart(now),
+      sum: online ? players : 0,
+      samples: online ? 1 : 0,
+      total: 1,
+      p: online ? players : 0,
+      m: max,
+      o: online,
+    });
+    if (history.length > MAX_HISTORY) history.shift();
+  }
+
   try {
     localStorage.setItem('scrims-history', JSON.stringify(history));
   } catch {}
@@ -217,18 +252,19 @@ function drawGraph() {
 
   if (history.length < 2) {
     ctx.fillStyle = '#3a3a3a';
-    ctx.font = '9px monospace';
+    ctx.font = '11px monospace';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText('Collecting data — refreshes every 60s', W / 2, H / 2);
+    ctx.fillText('Collecting data — updates every hour', W / 2, H / 2);
     return;
   }
 
   const globalMax = Math.max(...history.map(h => h.m ?? 0), 1);
-  const pad = { top: 18, right: 10, bottom: 22, left: 30 };
+  const pad = { top: 20, right: 14, bottom: 28, left: 36 };
   const cW = W - pad.left - pad.right;
   const cH = H - pad.top - pad.bottom;
 
+  // Grid lines + Y labels
   for (let i = 0; i <= 4; i++) {
     const y = pad.top + (cH / 4) * i;
     const val = Math.round(globalMax * (1 - i / 4));
@@ -240,36 +276,56 @@ function drawGraph() {
     ctx.lineTo(pad.left + cW, y);
     ctx.stroke();
 
-    ctx.fillStyle = '#444';
-    ctx.font = '8px monospace';
+    ctx.fillStyle = '#555';
+    ctx.font = '11px monospace';
     ctx.textAlign = 'right';
     ctx.textBaseline = 'middle';
     ctx.fillText(val, pad.left - 4, y);
   }
 
   const n = history.length;
-  const step = cW / n;
-  const barW = Math.max(2, step * 0.72);
 
-  history.forEach((pt, i) => {
-    const x = pad.left + i * step + (step - barW) / 2;
-    const ratio = pt.o && globalMax > 0 ? pt.p / globalMax : 0;
-    const barH = Math.max(ratio > 0 ? 2 : 0, ratio * cH);
-    const y = pad.top + cH - barH;
+  const pts = history.map((pt, i) => ({
+    x: pad.left + (n === 1 ? cW / 2 : (i / (n - 1)) * cW),
+    y: pad.top + cH - (pt.o ? (pt.p / globalMax) : 0) * cH,
+    pt,
+  }));
 
-    if (!pt.o || pt.p === 0) {
-      ctx.fillStyle = '#2a1010';
-      ctx.fillRect(Math.round(x), pad.top + cH - 2, Math.round(barW), 2);
-    } else {
-      const grad = ctx.createLinearGradient(0, y, 0, y + barH);
-      grad.addColorStop(0, '#88ff44');
-      grad.addColorStop(0.5, '#55cc22');
-      grad.addColorStop(1, '#3aaa10');
-      ctx.fillStyle = grad;
-      ctx.fillRect(Math.round(x), Math.round(y), Math.round(barW), Math.ceil(barH));
-    }
-  });
+  // Filled area under line
+  ctx.beginPath();
+  ctx.moveTo(pts[0].x, pad.top + cH);
+  pts.forEach(p => ctx.lineTo(p.x, p.y));
+  ctx.lineTo(pts[n - 1].x, pad.top + cH);
+  ctx.closePath();
+  const areaGrad = ctx.createLinearGradient(0, pad.top, 0, pad.top + cH);
+  areaGrad.addColorStop(0, 'rgba(85,255,85,0.2)');
+  areaGrad.addColorStop(1, 'rgba(85,255,85,0.02)');
+  ctx.fillStyle = areaGrad;
+  ctx.fill();
 
+  // Line
+  ctx.beginPath();
+  pts.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
+  ctx.strokeStyle = '#55FF55';
+  ctx.lineWidth = 2;
+  ctx.lineJoin = 'round';
+  ctx.stroke();
+
+  // Dots (skip if too crowded)
+  const dotR = n > 72 ? 0 : n > 36 ? 2 : 3;
+  if (dotR > 0) {
+    pts.forEach(p => {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, dotR, 0, Math.PI * 2);
+      ctx.fillStyle = p.pt.o ? '#55FF55' : '#FF5555';
+      ctx.fill();
+      ctx.strokeStyle = '#000';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    });
+  }
+
+  // MAX dashed line
   ctx.strokeStyle = 'rgba(255,255,85,0.3)';
   ctx.lineWidth = 1;
   ctx.setLineDash([3, 4]);
@@ -279,22 +335,27 @@ function drawGraph() {
   ctx.stroke();
   ctx.setLineDash([]);
 
-  ctx.fillStyle = 'rgba(255,255,85,0.4)';
-  ctx.font = '7px monospace';
+  ctx.fillStyle = 'rgba(255,255,85,0.5)';
+  ctx.font = '10px monospace';
   ctx.textAlign = 'left';
   ctx.textBaseline = 'bottom';
   ctx.fillText(`MAX ${globalMax}`, pad.left + 2, pad.top - 2);
 
-  ctx.fillStyle = '#444';
-  ctx.font = '7px monospace';
+  // X axis hour labels
+  const tickEvery = Math.max(1, Math.floor(n / 8));
+  const firstDay = new Date(history[0].t).getDate();
+  ctx.fillStyle = '#555';
+  ctx.font = '10px monospace';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'top';
-  const tickEvery = Math.max(1, Math.floor(n / 6));
   history.forEach((pt, i) => {
-    if (i % tickEvery !== 0) return;
-    const x = pad.left + i * step + step / 2;
-    const lbl = new Date(pt.t).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    ctx.fillText(lbl, x, pad.top + cH + 4);
+    if (i % tickEvery !== 0 && i !== n - 1) return;
+    const x = pad.left + (n === 1 ? cW / 2 : (i / (n - 1)) * cW);
+    const d = new Date(pt.t);
+    const lbl = d.getDate() !== firstDay
+      ? d.toLocaleDateString([], { weekday: 'short' }) + ' ' + d.getHours() + 'h'
+      : d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    ctx.fillText(lbl, x, pad.top + cH + 5);
   });
 }
 
@@ -303,26 +364,26 @@ graphCanvas.addEventListener('mousemove', e => {
 
   const rect = graphCanvas.getBoundingClientRect();
   const mx = e.clientX - rect.left;
-  const padLeft = 30, padRight = 10;
+  const padLeft = 36, padRight = 14;
   const cW = rect.width - padLeft - padRight;
   const n = history.length;
-  const step = cW / n;
-  const idx = Math.min(n - 1, Math.max(0, Math.floor((mx - padLeft) / step)));
+  const idx = Math.min(n - 1, Math.max(0, Math.round((mx - padLeft) / cW * (n - 1))));
   const pt = history[idx];
   if (!pt) return;
 
-  const time = new Date(pt.t).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  const d = new Date(pt.t);
+  const timeStr = d.toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
   const status = pt.o
     ? `<span class="tip-status-online">Online</span>`
     : `<span class="tip-status-offline">Offline</span>`;
 
-  graphTooltip.innerHTML = `${time}<br>${status}${pt.o ? ` · ${pt.p} / ${pt.m}` : ''}`;
+  graphTooltip.innerHTML = `${timeStr}<br>${status}${pt.o ? ` · avg ${pt.p} / ${pt.m}` : ''}`;
   graphTooltip.classList.remove('hidden');
 
-  const barCenterX = padLeft + idx * step + step / 2;
+  const x = padLeft + (n === 1 ? cW / 2 : (idx / (n - 1)) * cW);
   const tooltipW = graphTooltip.offsetWidth;
   const canvasW = rect.width;
-  let left = barCenterX;
+  let left = x;
   if (left - tooltipW / 2 < 4) left = tooltipW / 2 + 4;
   if (left + tooltipW / 2 > canvasW - 4) left = canvasW - tooltipW / 2 - 4;
   graphTooltip.style.left = `${left}px`;
