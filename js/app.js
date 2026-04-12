@@ -14,7 +14,6 @@ const serverIcon = document.getElementById('serverIcon');
 const statusBanner = document.getElementById('statusBanner');
 const statusPip = document.getElementById('statusPip');
 const statusText = document.getElementById('statusText');
-const versionBadge = document.getElementById('versionBadge');
 const infoGrid = document.getElementById('infoGrid');
 const playerCount = document.getElementById('playerCount');
 const motdCell = document.getElementById('motdCell');
@@ -137,13 +136,6 @@ function render(data) {
   const max = data.players?.max ?? 0;
 
   if (data.icon) serverIcon.src = data.icon;
-
-  if (data.version) {
-    versionBadge.textContent = data.version;
-    versionBadge.classList.remove('hidden');
-  } else {
-    versionBadge.classList.add('hidden');
-  }
 
   statusBanner.className = `status-banner ${online ? 'online' : 'offline'}`;
   statusPip.className = `status-pip ${online ? 'online' : 'offline'}`;
