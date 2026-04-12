@@ -1,42 +1,29 @@
-/* ============================================================
-   Minecraft Server Tracker — Style Sheet
-   ============================================================ */
-
-/* ── Variables ─────────────────────────────────────────────── */
 :root {
-  /* Minecraft palette */
-  --mc-green:      #55FF55;
-  --mc-green-dim:  #00AA00;
-  --mc-red:        #FF5555;
-  --mc-red-dim:    #AA0000;
-  --mc-yellow:     #FFFF55;
-  --mc-gold:       #FFAA00;
-  --mc-white:      #FFFFFF;
-  --mc-gray:       #AAAAAA;
-  --mc-dark-gray:  #555555;
+  --mc-green:     #55FF55;
+  --mc-green-dim: #00AA00;
+  --mc-red:       #FF5555;
+  --mc-red-dim:   #AA0000;
+  --mc-yellow:    #FFFF55;
+  --mc-gold:      #FFAA00;
+  --mc-white:     #FFFFFF;
+  --mc-gray:      #AAAAAA;
+  --mc-dark-gray: #555555;
 
-  /* UI structure */
-  --bg:            #101010;
-  --panel-bg:      #1a1a1a;
-  --panel-inner:   #141414;
-  --rule-color:    #2a2a2a;
+  --bg:           #101010;
+  --panel-bg:     #1a1a1a;
+  --panel-inner:  #141414;
 
-  /* Minecraft bevel */
-  --bevel-light:   rgba(255,255,255,0.12);
-  --bevel-dark:    rgba(0,0,0,0.6);
+  --bevel-light:  rgba(255,255,255,0.12);
+  --bevel-dark:   rgba(0,0,0,0.6);
 
-  /* Typography */
-  --font-pixel:    'Press Start 2P', monospace;
-  --font-body:     'Segoe UI', system-ui, -apple-system, sans-serif;
+  --font-pixel:   'Press Start 2P', monospace;
+  --font-body:    'Segoe UI', system-ui, -apple-system, sans-serif;
 }
 
-/* ── Reset ──────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-/* ── Body / Background ──────────────────────────────────────── */
 body {
   background-color: var(--bg);
-  /* Subtle 32×32 stone-block grid */
   background-image:
     linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
     linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
@@ -50,14 +37,12 @@ body {
   padding: 2.5rem 1rem 5rem;
 }
 
-/* ── Page wrapper ───────────────────────────────────────────── */
 .page-wrap {
   width: 100%;
   max-width: 760px;
   zoom: 1.15;
 }
 
-/* ── Header ─────────────────────────────────────────────────── */
 .site-header {
   display: flex;
   align-items: center;
@@ -65,7 +50,6 @@ body {
   margin-bottom: 1.75rem;
 }
 
-/* Grass block CSS art */
 .grass-block {
   width: 64px;
   height: 64px;
@@ -81,15 +65,10 @@ body {
 
 .grass-top {
   height: 17px;
-  background: linear-gradient(180deg,
-    #6bbf3a 0%,
-    #5aab2e 50%,
-    #4d9425 100%
-  );
+  background: linear-gradient(180deg, #6bbf3a 0%, #5aab2e 50%, #4d9425 100%);
   position: relative;
 }
 
-/* tiny grass blade details */
 .grass-top::before {
   content: '';
   position: absolute;
@@ -120,7 +99,6 @@ body {
     radial-gradient(ellipse 2px 2px at 44px 32px, rgba(0,0,0,.22) 100%, transparent 100%);
 }
 
-/* Server icon (from API) */
 .server-icon {
   width: 64px;
   height: 64px;
@@ -129,7 +107,6 @@ body {
   box-shadow: 3px 3px 0 #000;
 }
 
-/* Header text */
 .header-text {
   display: flex;
   flex-direction: column;
@@ -164,11 +141,9 @@ h1 {
   text-decoration: underline;
 }
 
-/* ── Main panel (Minecraft GUI style) ───────────────────────── */
 .mc-panel {
   background: var(--panel-bg);
   border: 2px solid #000;
-  /* Bevel: lighter top-left, darker bottom-right */
   box-shadow:
     inset 2px 2px 0 var(--bevel-light),
     inset -2px -2px 0 var(--bevel-dark),
@@ -176,7 +151,6 @@ h1 {
   padding: 1.5rem 1.75rem 1.25rem;
 }
 
-/* ── Status row ─────────────────────────────────────────────── */
 .status-row {
   display: flex;
   align-items: center;
@@ -225,10 +199,9 @@ h1 {
 }
 
 .status-text.online  { color: var(--mc-green); text-shadow: 1px 1px var(--mc-green-dim); }
-.status-text.offline { color: var(--mc-red);   text-shadow: 1px 1px var(--mc-red-dim);   }
+.status-text.offline { color: var(--mc-red);   text-shadow: 1px 1px var(--mc-red-dim); }
 .status-text.error   { color: var(--mc-gold);  text-shadow: 1px 1px #a06000; }
 
-/* ── Info grid ──────────────────────────────────────────────── */
 .info-grid {
   display: flex;
   gap: 1.5rem;
@@ -273,7 +246,6 @@ h1 {
   color: var(--mc-gray);
 }
 
-/* ── Horizontal rule ────────────────────────────────────────── */
 .mc-rule {
   border: none;
   height: 2px;
@@ -282,7 +254,6 @@ h1 {
   margin: 1.25rem 0;
 }
 
-/* ── Player list ────────────────────────────────────────────── */
 .section-heading {
   font-family: var(--font-pixel);
   font-size: 0.5rem;
@@ -344,7 +315,6 @@ h1 {
   line-height: 1.8;
 }
 
-/* ── Panel footer ───────────────────────────────────────────── */
 .panel-footer {
   display: flex;
   justify-content: space-between;
@@ -384,7 +354,6 @@ h1 {
   color: var(--mc-dark-gray);
 }
 
-/* XP-bar style progress */
 .progress-track {
   width: 72px;
   height: 6px;
@@ -402,13 +371,11 @@ h1 {
   transition: width 1s linear;
 }
 
-/* Low-time warning color */
 .progress-fill.warn {
   background: linear-gradient(180deg, #ffdd44 0%, #ffaa00 60%, #dd8800 100%);
   box-shadow: 0 0 4px rgba(255,170,0,.5);
 }
 
-/* ── Minecraft button ───────────────────────────────────────── */
 .mc-btn {
   font-family: var(--font-pixel);
   font-size: 0.45rem;
@@ -441,7 +408,6 @@ h1 {
   transform: translateY(1px);
 }
 
-/* ── Version badge ──────────────────────────────────────────── */
 .version-badge {
   font-family: var(--font-pixel);
   font-size: 0.38rem;
@@ -455,7 +421,6 @@ h1 {
   white-space: nowrap;
 }
 
-/* ── Join / leave animations ────────────────────────────────── */
 @keyframes chipJoin {
   0% {
     background: #0e2010;
@@ -487,7 +452,6 @@ h1 {
   pointer-events: none;
 }
 
-/* ── Graph panel ────────────────────────────────────────────── */
 .graph-panel {
   margin-top: 0.75rem;
 }
@@ -537,8 +501,7 @@ h1 {
   transform: translateX(-50%);
 }
 
-.graph-tooltip .tip-status-online { color: var(--mc-green); }
+.graph-tooltip .tip-status-online  { color: var(--mc-green); }
 .graph-tooltip .tip-status-offline { color: var(--mc-red); }
 
-/* ── Utility ────────────────────────────────────────────────── */
 .hidden { display: none !important; }
