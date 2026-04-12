@@ -30,13 +30,32 @@ const graphTooltip = document.getElementById('graphTooltip');
 
 let history = [];
 
-function loadHistory() {
+async function loadHistory() {
+  let shared = [];
+  let local = [];
+
   try {
-    const raw = JSON.parse(localStorage.getItem('scrims-history') || '[]');
-    // discard old per-minute format (entries without a key field)
-    history = raw.filter(h => h.key !== undefined);
-  } catch {
-    history = [];
+    const res = await fetch('data/history.json');
+    if (res.ok) shared = (await res.json()).filter(h => h.key !== undefined);
+  } catch {}
+
+  try {
+    local = JSON.parse(localStorage.getItem('scrims-history') || '[]').filter(h => h.key !== undefined);
+  } catch {}
+
+  if (shared.length > 0) {
+    history = shared;
+    if (local.length > 0) {
+      const lastLocal = local[local.length - 1];
+      const lastShared = shared[shared.length - 1];
+      if (lastLocal.t > lastShared.t) {
+        history.push(lastLocal);
+      } else if (lastLocal.key === lastShared.key && lastLocal.samples > lastShared.samples) {
+        history[history.length - 1] = lastLocal;
+      }
+    }
+  } else {
+    history = local;
   }
 }
 
@@ -291,24 +310,40 @@ function drawGraph() {
     pt,
   }));
 
+  // Catmull-Rom spline helper
+  function spline(points) {
+    for (let i = 0; i < points.length - 1; i++) {
+      const p0 = points[Math.max(0, i - 1)];
+      const p1 = points[i];
+      const p2 = points[i + 1];
+      const p3 = points[Math.min(points.length - 1, i + 2)];
+      ctx.bezierCurveTo(
+        p1.x + (p2.x - p0.x) / 6, p1.y + (p2.y - p0.y) / 6,
+        p2.x - (p3.x - p1.x) / 6, p2.y - (p3.y - p1.y) / 6,
+        p2.x, p2.y
+      );
+    }
+  }
+
   // Filled area under line
-  ctx.beginPath();
-  ctx.moveTo(pts[0].x, pad.top + cH);
-  pts.forEach(p => ctx.lineTo(p.x, p.y));
-  ctx.lineTo(pts[n - 1].x, pad.top + cH);
-  ctx.closePath();
   const areaGrad = ctx.createLinearGradient(0, pad.top, 0, pad.top + cH);
   areaGrad.addColorStop(0, 'rgba(85,255,85,0.2)');
   areaGrad.addColorStop(1, 'rgba(85,255,85,0.02)');
+  ctx.beginPath();
+  ctx.moveTo(pts[0].x, pad.top + cH);
+  ctx.lineTo(pts[0].x, pts[0].y);
+  spline(pts);
+  ctx.lineTo(pts[n - 1].x, pad.top + cH);
+  ctx.closePath();
   ctx.fillStyle = areaGrad;
   ctx.fill();
 
   // Line
   ctx.beginPath();
-  pts.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
+  ctx.moveTo(pts[0].x, pts[0].y);
+  spline(pts);
   ctx.strokeStyle = '#55FF55';
   ctx.lineWidth = 2;
-  ctx.lineJoin = 'round';
   ctx.stroke();
 
   // Dots (skip if too crowded)
@@ -430,6 +465,7 @@ refreshBtn.addEventListener('click', () => {
   fetchStatus();
 });
 
-loadHistory();
-drawGraph();
-fetchStatus();
+loadHistory().then(() => {
+  drawGraph();
+  fetchStatus();
+});
