@@ -35,6 +35,7 @@
       <div class="status-row">
         <div class="status-pip" id="statusPip"></div>
         <span class="status-text" id="statusText">Checking...</span>
+        <span class="version-badge hidden" id="versionBadge"></span>
       </div>
 
       <!-- Player count + MOTD -->
@@ -70,6 +71,15 @@
       </div>
 
     </div><!-- .mc-panel -->
+
+    <!-- Graph panel -->
+    <div class="mc-panel graph-panel">
+      <p class="section-heading">Player Count History <span class="graph-sub">last 30 checks</span></p>
+      <div class="graph-wrap">
+        <canvas id="graphCanvas"></canvas>
+        <div class="graph-tooltip hidden" id="graphTooltip"></div>
+      </div>
+    </div>
 
   </div><!-- .page-wrap -->
 
