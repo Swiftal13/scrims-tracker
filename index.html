@@ -65,7 +65,13 @@
 
     <!-- Graph panel -->
     <div class="mc-panel graph-panel">
-      <p class="section-heading">Player Count History <span class="graph-sub">hourly avg · last 7 days</span></p>
+      <div class="graph-header">
+        <p class="section-heading">Player Count History</p>
+        <div class="graph-toggles">
+          <button class="graph-toggle active" id="toggleHour" data-view="hour">Hour</button>
+          <button class="graph-toggle" id="toggleDay" data-view="day">Day</button>
+        </div>
+      </div>
       <div class="graph-wrap">
         <canvas id="graphCanvas"></canvas>
         <div class="graph-tooltip hidden" id="graphTooltip"></div>

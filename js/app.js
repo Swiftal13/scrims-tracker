@@ -27,8 +27,33 @@ const progressFill = document.getElementById('progressFill');
 const refreshBtn = document.getElementById('refreshBtn');
 const graphCanvas = document.getElementById('graphCanvas');
 const graphTooltip = document.getElementById('graphTooltip');
+const toggleHour = document.getElementById('toggleHour');
+const toggleDay = document.getElementById('toggleDay');
 
 let history = [];
+let graphView = 'hour';
+
+function getGraphData() {
+  const now = new Date();
+  if (graphView === 'hour') {
+    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+    const todayEnd = todayStart + 86400000;
+    return history.filter(h => h.t >= todayStart && h.t < todayEnd);
+  } else {
+    const weekAgo = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 6).getTime();
+    const days = {};
+    history.filter(h => h.t >= weekAgo).forEach(h => {
+      const d = new Date(h.t);
+      const key = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+      if (!days[key]) days[key] = { key, t: new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime(), sum: 0, samples: 0, m: 0, o: false };
+      days[key].sum += h.sum;
+      days[key].samples += h.samples;
+      days[key].m = Math.max(days[key].m, h.m);
+      if (h.o) days[key].o = true;
+    });
+    return Object.values(days).map(d => ({ ...d, p: d.samples > 0 ? Math.round(d.sum / d.samples) : 0 }));
+  }
+}
 
 async function loadHistory() {
   let shared = [];
@@ -268,7 +293,9 @@ function drawGraph() {
   ctx.fillStyle = '#0d0d0d';
   ctx.fillRect(0, 0, W, H);
 
-  if (history.length < 2) {
+  const data = getGraphData();
+
+  if (data.length < 2) {
     ctx.fillStyle = '#3a3a3a';
     ctx.font = '11px monospace';
     ctx.textAlign = 'center';
@@ -277,7 +304,7 @@ function drawGraph() {
     return;
   }
 
-  const globalMax = Math.max(...history.map(h => h.m ?? 0), 1);
+  const globalMax = Math.max(...data.map(h => h.m ?? 0), 1);
   const pad = { top: 20, right: 14, bottom: 28, left: 36 };
   const cW = W - pad.left - pad.right;
   const cH = H - pad.top - pad.bottom;
@@ -301,9 +328,9 @@ function drawGraph() {
     ctx.fillText(val, pad.left - 4, y);
   }
 
-  const n = history.length;
+  const n = data.length;
 
-  const pts = history.map((pt, i) => ({
+  const pts = data.map((pt, i) => ({
     x: pad.left + (n === 1 ? cW / 2 : (i / (n - 1)) * cW),
     y: pad.top + cH - (pt.o ? (pt.p / globalMax) : 0) * cH,
     pt,
@@ -375,38 +402,40 @@ function drawGraph() {
   ctx.textBaseline = 'bottom';
   ctx.fillText(`MAX ${globalMax}`, pad.left + 2, pad.top - 2);
 
-  // X axis hour labels
+  // X axis labels
   const tickEvery = Math.max(1, Math.floor(n / 8));
-  const firstDay = new Date(history[0].t).getDate();
   ctx.fillStyle = '#555';
   ctx.font = '10px monospace';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'top';
-  history.forEach((pt, i) => {
+  data.forEach((pt, i) => {
     if (i % tickEvery !== 0 && i !== n - 1) return;
     const x = pad.left + (n === 1 ? cW / 2 : (i / (n - 1)) * cW);
     const d = new Date(pt.t);
-    const lbl = d.getDate() !== firstDay
-      ? d.toLocaleDateString([], { weekday: 'short' }) + ' ' + d.getHours() + 'h'
+    const lbl = graphView === 'day'
+      ? d.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' })
       : d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     ctx.fillText(lbl, x, pad.top + cH + 5);
   });
 }
 
 graphCanvas.addEventListener('mousemove', e => {
-  if (history.length < 2) return;
+  const data = getGraphData();
+  if (data.length < 2) return;
 
   const rect = graphCanvas.getBoundingClientRect();
   const mx = e.clientX - rect.left;
   const padLeft = 36, padRight = 14;
   const cW = rect.width - padLeft - padRight;
-  const n = history.length;
+  const n = data.length;
   const idx = Math.min(n - 1, Math.max(0, Math.round((mx - padLeft) / cW * (n - 1))));
-  const pt = history[idx];
+  const pt = data[idx];
   if (!pt) return;
 
   const d = new Date(pt.t);
-  const timeStr = d.toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+  const timeStr = graphView === 'day'
+    ? d.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' })
+    : d.toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
   const status = pt.o
     ? `<span class="tip-status-online">Online</span>`
     : `<span class="tip-status-offline">Offline</span>`;
@@ -462,6 +491,15 @@ function markUpdated() {
 refreshBtn.addEventListener('click', () => {
   clearInterval(timer);
   fetchStatus();
+});
+
+[toggleHour, toggleDay].forEach(btn => {
+  btn.addEventListener('click', () => {
+    graphView = btn.dataset.view;
+    toggleHour.classList.toggle('active', graphView === 'hour');
+    toggleDay.classList.toggle('active', graphView === 'day');
+    drawGraph();
+  });
 });
 
 loadHistory().then(() => {
