@@ -65,12 +65,10 @@
 
     <!-- Graph panel -->
     <div class="mc-panel graph-panel">
-      <div class="graph-header">
-        <p class="section-heading">Player Count History</p>
-        <div class="graph-toggles">
-          <button class="graph-toggle active" id="toggleHour" data-view="hour">Hour</button>
-          <button class="graph-toggle" id="toggleDay" data-view="day">Day</button>
-        </div>
+      <p class="section-heading">Player Count History</p>
+      <div class="graph-toggles">
+        <button class="mc-btn mc-btn--active" id="toggleHour" data-view="hour">Hour</button>
+        <button class="mc-btn" id="toggleDay" data-view="day">Day</button>
       </div>
       <div class="graph-wrap">
         <canvas id="graphCanvas"></canvas>

@@ -496,8 +496,8 @@ refreshBtn.addEventListener('click', () => {
 [toggleHour, toggleDay].forEach(btn => {
   btn.addEventListener('click', () => {
     graphView = btn.dataset.view;
-    toggleHour.classList.toggle('active', graphView === 'hour');
-    toggleDay.classList.toggle('active', graphView === 'day');
+    toggleHour.classList.toggle('mc-btn--active', graphView === 'hour');
+    toggleDay.classList.toggle('mc-btn--active', graphView === 'day');
     drawGraph();
   });
 });
