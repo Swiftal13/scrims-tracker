@@ -237,11 +237,12 @@ h1 {
 }
 
 .player-hero-count {
-  font-family: var(--font-pixel);
-  font-size: 0.9rem;
+  font-family: var(--font-body);
+  font-size: 1.4rem;
+  font-weight: 600;
   color: var(--mc-white);
   text-shadow: 1px 1px rgba(0,0,0,.8);
-  line-height: 1.4;
+  line-height: 1.2;
 }
 
 .player-hero-count .accent {
